@@ -19,8 +19,8 @@ Public Subnets (/24 per AZ)
    NAT Gateways only
    Example: 10.80.1.0/24 (AZ-a), 10.80.2.0/24 (AZ-b), 10.80.3.0/24 (AZ-c)
    Routes: 0.0.0.0/0 → Internet Gateway
+<b>Private-App Subnets (/19 per AZ — 8,190 IPs each)</b><br>
 
-**Private-App Subnets (/19 per AZ — 8,190 IPs each)**
   EKS worker nodes and 3GPP CNF pods
   Example: 10.80.32.0/19 (AZ-a), 10.80.64.0/19 (AZ-b), 10.80.96.0/19 (AZ-c)
   Routes:
