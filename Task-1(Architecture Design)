@@ -1,0 +1,39 @@
+I'm presenting two architectures: a baseline single-region design that satisfies all stated requirements, and an enhanced multi-region design for production-grade disaster recovery.
+
+ARCHITECTURE 1: Single-Region Design (Baseline):
+
+Overview:
+
+This architecture deploys a Regional Hub in us-west-2 only, meeting all five stated requirements: high availability across multiple AZs, elastic scalability, zero-trust security with SOC 2 alignment, full IaC automation, and seamless connectivity through Transit Gateway.
+
+This design is resilient to single-AZ failures (as required) but would require manual recovery in the event of a complete regional outage.
+1. Network Design
+
+VPC Architecture
+Single VPC in us-west-2
+  VPC CIDR: 10.80.0.0/16 (65,536 IPs)
+  Deployed across 3 Availability Zones (us-west-2a, us-west-2b, us-west-2c)
+
+Subnet Design (Per AZ)
+Public Subnets (/24 per AZ)
+   NAT Gateways only
+   Example: 10.80.1.0/24 (AZ-a), 10.80.2.0/24 (AZ-b), 10.80.3.0/24 (AZ-c)
+   Routes: 0.0.0.0/0 → Internet Gateway
+
+**Private-App Subnets (/19 per AZ — 8,190 IPs each)**
+  EKS worker nodes and 3GPP CNF pods
+  Example: 10.80.32.0/19 (AZ-a), 10.80.64.0/19 (AZ-b), 10.80.96.0/19 (AZ-c)
+  Routes:
+    0.0.0.0/0 → NAT Gateway (same AZ)
+    10.0.0.0/8 → Transit Gateway
+    Ground station CIDRs → Transit Gateway
+
+Private-Data Subnets (/24 per AZ)
+  VPC endpoints (S3, DynamoDB, Secrets Manager)
+  Example: 10.80.4.0/24 (AZ-a), 10.80.5.0/24 (AZ-b), 10.80.6.0/24 (AZ-c)
+  Routes:
+    No 0.0.0.0/0 route (internet blocked)
+    10.0.0.0/8 → Transit Gateway
+    S3/DynamoDB gateway endpoints
+
+
